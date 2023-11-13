@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCalendarEvents } from "../api-client";
+import { CalendarEvent, getCalendarEvents } from "../api-client";
 import styled, { keyframes } from "styled-components";
 
 const Container = styled.div`
@@ -54,7 +54,7 @@ const LoadingSpinner = styled.div`
 `;
 
 const CalendarSummary: React.FunctionComponent = () => {
-  const [events, setEvents] = useState<{ [key: string]: any[] }>({});
+  const [events, setEvents] = useState<{ [key: string]: CalendarEvent[] }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const CalendarSummary: React.FunctionComponent = () => {
 
         const eventsDataArray = await Promise.all(promises);
 
-        const eventsData: { [key: string]: any[] } = {};
+        const eventsData: { [key: string]: CalendarEvent[] } = {};
         eventsDataArray.forEach((eventsOfDay, index) => {
           const date = new Date(currentDay);
           date.setDate(currentDay.getDate() + index);
@@ -99,7 +99,7 @@ const CalendarSummary: React.FunctionComponent = () => {
     );
   };
 
-  const findLongestEvent = (day: string): any => {
+  const findLongestEvent = (day: string) => {
     const eventsOfDay = events[day] || [];
 
     const longestEvent = eventsOfDay.reduce(
