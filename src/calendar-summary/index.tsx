@@ -53,41 +53,45 @@ const LoadingSpinner = styled.div`
   animation: ${spinAnimation} 1s linear infinite;
 `;
 
+// for optimization, I could use useMemo for functions calculating events
+// so that they would not be run again during rendering.
+// Also can make hook for fetching data
+
 const CalendarSummary: React.FunctionComponent = () => {
   const [events, setEvents] = useState<{ [key: string]: CalendarEvent[] }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const currentDay = new Date();
-        const promises = [];
-
-        for (let i = 0; i < 7; i++) {
-          const nextDay = new Date(currentDay);
-          nextDay.setDate(currentDay.getDate() + i);
-          promises.push(getCalendarEvents(nextDay));
-        }
-
-        const eventsDataArray = await Promise.all(promises);
-
-        const eventsData: { [key: string]: CalendarEvent[] } = {};
-        eventsDataArray.forEach((eventsOfDay, index) => {
-          const date = new Date(currentDay);
-          date.setDate(currentDay.getDate() + index);
-          eventsData[date.toISOString().split("T")[0]] = eventsOfDay;
-        });
-
-        setEvents(eventsData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching calendar events:", error);
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const currentDay = new Date();
+      const promises = [];
+
+      for (let i = 0; i < 7; i++) {
+        const nextDay = new Date(currentDay);
+        nextDay.setDate(currentDay.getDate() + i);
+        promises.push(getCalendarEvents(nextDay));
+      }
+
+      const eventsDataArray = await Promise.all(promises);
+
+      const eventsData: { [key: string]: CalendarEvent[] } = {};
+      eventsDataArray.forEach((eventsOfDay, index) => {
+        const date = new Date(currentDay);
+        date.setDate(currentDay.getDate() + index);
+        eventsData[date.toISOString().split("T")[0]] = eventsOfDay;
+      });
+
+      setEvents(eventsData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      setLoading(false);
+    }
+  };
 
   const calculateTotalDuration = (day: string): number => {
     const eventsOfDay = events[day] || [];

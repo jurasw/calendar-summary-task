@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import CalendarSummary from './CalendarSummary';
+import CalendarSummary from './calendar-summary';
 
 function App() {
   return (
